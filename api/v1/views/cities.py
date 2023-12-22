@@ -6,15 +6,24 @@ from models import storage
 from api.v1.views import app_views
 from models.city import City
 method_lt = ['GET', 'POST', 'PUT', 'DELETE']
+
 @app_views.route('/states/<state_id>/cities', strict_slashes=False,  methods=["GET", "POST"])
 def city_page(state_id):
+    from models.state import State
+    # Check valid state_id
+    doexist = False
+    st_list = [obj.to_dict() for obj in storage.all(State).values()]
+    for state_dict in st_list:
+        if state_id == state_dict.get('id'):
+            doexist = True
+    if not doexist:
+        abort(404)
+    #
     if request.method == "GET":
         ret = [ obj.to_dict() for obj in storage.all(City).values()]
         id_list = []
         for i in ret:
-            print(i)
-            if state_id == i.get('state_id'):
-                id_list.append(i)
+	@@ -30,8 +30,6 @@ def city_page(state_id):
         return jsonify(id_list), 200
 
     elif request.method == "POST":
@@ -23,11 +32,11 @@ def city_page(state_id):
         req_dict = request.get_json()
         if 'name' not in req_dict:
             return 'Missing name', 400
-        for CityObj in storage.all(City).values() :
-            CiD = CityObj.to_dict()
-            if req_dict.get('name') == CiD.get('name'):
-                return jsonify(CiD), 201
-        abort(404)
+        new_city = City(**req_dict)
+        new_city.state_id = state_id
+        new_city.save()
+        storage.save()
+        return jsonify(new_city.to_dict()), 201
 @app_views.route('/cities/<city_id>', strict_slashes=False,  methods=method_lt)
 def city_get_id(city_id):
     if request.method == "GET":
