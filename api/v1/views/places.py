@@ -37,8 +37,6 @@ def place_page(city_id):
 
         if req_dict.get('user_id') is None:
             return 'Missing user_id', 400
-        if storage.get(User, req_dict.get('user_id')) is None:
-            abort(404)
         if 'name' not in req_dict:
             return 'Missing name', 400
         new_place = Place(**req_dict)
