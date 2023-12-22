@@ -17,6 +17,9 @@ def place_page(city_id):
 
     if storage.get(City, city_id) is None:
         abort(404)
+    if request.method == "GET":
+        ret = [obj.to_dict() for obj in storage.all(Place).values()]
+        id_list = []
         for i in ret:
             if city_id == i.get('city_id'):
                 id_list.append(i)
