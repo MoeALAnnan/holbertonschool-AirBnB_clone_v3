@@ -58,20 +58,9 @@ def review_get_id(review_id=None):
         return jsonify(ReviewObj.to_dict()), 200
     elif request.method == "DELETE":
         ReviewObj = storage.get(Review, review_id)
-        if ReviewObj is None:
-            abort(404)
         ReviewObj.delete()
         storage.save()
         return {}, 200
-    elif request.method == "PUT":
-        if review_id is None:
-            abort(404)
-        obj = storage.get(Review, review_id)
-        if obj is None:
-            abort(404)
-        if not request.is_json:
-            return 'Not a JSON', 400
-
         for k, v in request.get_json().items():
             if k in ["id", "user_id", "place_id", "created_at", "update_at"]:
                 continue
