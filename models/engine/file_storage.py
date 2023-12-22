@@ -68,3 +68,21 @@ class FileStorage:
     def close(self):
         """call reload() method for deserializing the JSON file to objects"""
         self.reload()
+
+    def get(self, cls, id):
+        """ id to get, cls the class """
+        try:
+            return(self.__objects[f"{cls.__name__}.{id}"])
+        except:
+            return None
+
+    def count(self, cls=None):
+        """ Returns the number of objects in strage matching the given clss """
+        Count_state = 0
+        if cls is None:
+            return len(self.__objects)
+        else:
+            for value in self.__objects.values():
+                if isinstance(value, cls):
+                    Count_state += 1
+            return Count_state
