@@ -27,7 +27,7 @@ def retrieve_one_amenities(amenity_id=None):
     for data in all_amenities:
         if data["id"] == amenity_id:
             for key, value in data.items():
-                one_amenity[key] = values
+                one_amenity[key] = value
     if bool(one_amenity) is False:
         abort(404)
     else:
@@ -37,7 +37,8 @@ def retrieve_one_amenities(amenity_id=None):
 @app_views.route('/amenities/<amenity_id>', methods=['DELETE'])
 def delete_one_amenities(amenity_id=None):
     obj = storage.get(Amenity, amenity_id)
-    
+    if obj is None:
+        abort(404)
     else:
         obj.delete()
         storage.save()
@@ -47,7 +48,8 @@ def delete_one_amenities(amenity_id=None):
 @app_views.route('/amenities', methods=['POST'], strict_slashes=False)
 def post_amenities():
     request_dict = request.get_json()
-    
+    if not request.is_json:
+        return 'Not a JSON', 400
     if 'name' not in request_dict:
         return 'Missing name', 400
     New_amenity = Amenity(**request_dict)
