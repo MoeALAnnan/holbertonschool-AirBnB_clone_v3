@@ -53,6 +53,8 @@ def place_get_id(place_id=None):
     """ Retrieves a Place object. """
     if request.method == "GET":
         PlaceObj = storage.get(Place, place_id)
+        if PlaceObj is None:
+            abort(404)
         return jsonify(PlaceObj.to_dict()), 200
     elif request.method == "DELETE":
         PlaceObj = storage.get(Place, place_id)
