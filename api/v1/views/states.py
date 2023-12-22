@@ -1,3 +1,8 @@
+#!/usr/bin/python3
+""" New view for state model """
+from models import storage
+from flask import jsonify, abort, request
+from models import storage
 from api.v1.views import app_views
 from models.state import State
 
@@ -18,6 +23,7 @@ def state_page(state_id=None):
                 return jsonify(storage.get(State, state_id).to_dict())
             except AttributeError:
                 abort(404)
+
     elif request.method == 'DELETE':
         if state_id is None:
             abort(404)
@@ -28,6 +34,7 @@ def state_page(state_id=None):
             return jsonify({}), 200
         except AttributeError:
             abort(404)
+
     elif request.method == 'PUT':
         if state_id is None:
             abort(404)
@@ -40,6 +47,7 @@ def state_page(state_id=None):
             setattr(obj, k, v)
         storage.save()
         return jsonify(obj.to_dict()), 200
+
     elif request.method == 'POST':
         req_dict = request.get_json()
         if not request.is_json:
@@ -47,12 +55,9 @@ def state_page(state_id=None):
 
         if 'name' not in req_dict:
             return 'Missing name', 400
-        # VALIDATE CHECK
-        if request.get_json().get('name') == 'NewState':
-            return jsonify({'name': 'NewState', 'id': 123}), 201
-        # END
-        for state_obj in storage.all(State).values():
-            state_dict = state_obj.to_dict()
-            if request.get_json().get('name') == state_dict.get('name'):
-                return jsonify(state_dict), 201
-        return '{}', 205
+
+        new_state = State(**req_dict)
+        new_state.state_id = state_id
+        new_state.save()
+        storage.save()
+        return jsonify(new_state.to_dict()), 201
