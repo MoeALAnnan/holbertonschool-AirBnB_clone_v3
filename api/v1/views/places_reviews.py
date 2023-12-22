@@ -58,6 +58,8 @@ def review_get_id(review_id=None):
         return jsonify(ReviewObj.to_dict()), 200
     elif request.method == "DELETE":
         ReviewObj = storage.get(Review, review_id)
+        if ReviewObj is None:
+            abort(404)
         ReviewObj.delete()
         storage.save()
         return {}, 200
