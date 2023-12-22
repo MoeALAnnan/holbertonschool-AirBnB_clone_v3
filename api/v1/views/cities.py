@@ -5,6 +5,7 @@ from flask import jsonify, abort, request
 from models import storage
 from api.v1.views import app_views
 from models.city import City
+
 method_lt = ['GET', 'POST', 'PUT', 'DELETE']
 
 
@@ -32,7 +33,12 @@ def city_page(state_id):
     elif request.method == "POST":
         if not request.is_json:
             return 'Not a JSON', 400
-	@@ -41,6 +42,7 @@ def city_page(state_id):
+        req_dict = request.get_json()
+        if 'name' not in req_dict:
+            return 'Missing name', 400
+        new_city = City(**req_dict)
+        new_city.state_id = state_id
+        new_city.save()
         storage.save()
         return jsonify(new_city.to_dict()), 201
 
@@ -59,6 +65,7 @@ def city_get_id(city_id):
             abort(404)
         if not request.is_json:
             return 'Not a JSON', 400
+
         setattr(obj, 'name', request.get_json().get('name'))
         storage.save()
         return jsonify(obj.to_dict()), 200
