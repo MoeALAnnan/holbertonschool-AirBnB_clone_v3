@@ -43,7 +43,8 @@ def user_page(user_id=None):
         return jsonify(new_user.to_dict()), 201
 
     elif request.method == "PUT":
-        
+        if user_id is None:
+            abort(404)
         obj = storage.get(User, user_id)
         if obj is None:
             abort(404)
