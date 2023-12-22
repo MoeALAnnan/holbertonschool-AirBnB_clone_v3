@@ -67,6 +67,8 @@ def review_get_id(review_id=None):
         if review_id is None:
             abort(404)
         obj = storage.get(Review, review_id)
+        if obj is None:
+            abort(404)
         if not request.is_json:
             return 'Not a JSON', 400
 
