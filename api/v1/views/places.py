@@ -61,6 +61,7 @@ def place_get_id(place_id=None):
         if PlaceObj is None:
             abort(404)
         PlaceObj.delete()
+        storage.save()
         return {}, 200
     elif request.method == "PUT":
         if place_id is None:
@@ -68,12 +69,12 @@ def place_get_id(place_id=None):
         obj = storage.get(Place, place_id)
         if obj is None:
             abort(404)
+        if not request.is_json:
+            return 'Not a JSON', 400
+
         for k, v in request.get_json().items():
             if k in ["id", "user_id", "city_id", "created_at", "update_at"]:
                 continue
             setattr(obj, k, v)
-
-        if not request.is_json:
-            return 'Not a JSON', 400
         storage.save()
         return jsonify(obj.to_dict()), 200
